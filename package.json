@@ -1,0 +1,21 @@
+{
+  "name": "devispro-ia",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.21.0",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.21.0",
+  "devDependencies": {
+    "supabase": "^3.2.0"
+  }
+}
