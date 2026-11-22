@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test"
+    "test": "pnpm -r --if-present test",
+    "gen:types": "supabase gen types typescript --local > packages/shared/src/database.types.ts"
   },
   "devEngines": {
     "packageManager": {
