@@ -99,14 +99,14 @@ isOneToOne: false
                   ]
                 },"quote_lines": {
                   Row: {
-                    "catalog_item_id": string | null,"company_id": string,"id": string,"label": string,"position": number,"quantity": number,"quote_id": string,"unit": string,"unit_price_cents": number,"vat_rate": number
+                    "catalog_item_id": string | null,"company_id": string,"discount_percent": number,"id": string,"label": string,"position": number,"quantity": number,"quote_id": string,"unit": string,"unit_price_cents": number,"vat_rate": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "catalog_item_id"?: string | null,"company_id"?: string,"id"?: string,"label": string,"position"?: number,"quantity": number,"quote_id": string,"unit": string,"unit_price_cents": number,"vat_rate": number
+                    "catalog_item_id"?: string | null,"company_id"?: string,"discount_percent"?: number,"id"?: string,"label": string,"position"?: number,"quantity": number,"quote_id": string,"unit": string,"unit_price_cents": number,"vat_rate": number
                   }
                   Update: {
-                    "catalog_item_id"?: string | null,"company_id"?: string,"id"?: string,"label"?: string,"position"?: number,"quantity"?: number,"quote_id"?: string,"unit"?: string,"unit_price_cents"?: number,"vat_rate"?: number
+                    "catalog_item_id"?: string | null,"company_id"?: string,"discount_percent"?: number,"id"?: string,"label"?: string,"position"?: number,"quantity"?: number,"quote_id"?: string,"unit"?: string,"unit_price_cents"?: number,"vat_rate"?: number
                   }
                   Relationships: [
                     {
@@ -160,6 +160,9 @@ isOneToOne: false
                            },
 "current_company_id":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"save_quote":
+{ Args: { "p_client_id"?: string,"p_lines": Json,"p_notes"?: string,"p_quote_id": string,"p_status": Database["public"]['Enums']["quote_status"] }; Returns: undefined
                            }
           }
           Enums: {
