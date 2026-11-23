@@ -3,6 +3,8 @@ import { RequireAuth } from "./auth/RequireAuth";
 import Layout from "./components/Layout";
 import LoginPage from "./pages/LoginPage";
 import CatalogPage from "./pages/CatalogPage";
+import ClientsPage from "./pages/ClientsPage";
+import QuotesPage from "./pages/QuotesPage";
 
 export default function App() {
   return (
@@ -14,8 +16,9 @@ export default function App() {
       <Route element={<RequireAuth />}>
         <Route element={<Layout />}>
           <Route path="/catalogue" element={<CatalogPage />} />
-          <Route path="/clients" element={<ComingSoon title="Clients" />} />
-          <Route path="/devis" element={<ComingSoon title="Devis" />} />
+          <Route path="/clients" element={<ClientsPage />} />
+          <Route path="/devis" element={<QuotesPage />} />
+          <Route path="/devis/:id" element={<ComingSoon title="Éditeur de devis" />} />
         </Route>
       </Route>
 
