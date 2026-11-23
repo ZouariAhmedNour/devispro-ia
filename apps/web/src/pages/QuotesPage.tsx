@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { computeQuoteTotals, formatEuros } from "@devispro/shared";
+  import { formatEuros } from "@devispro/shared";
 import {
   STATUS_COLORS,
   STATUS_LABELS,
   createDraftQuote,
   listQuotes,
-  toCalcLine,
   type QuoteListItem,
 } from "../lib/quotes";
 import { toMessage } from "../lib/errors";
@@ -63,9 +62,7 @@ export default function QuotesPage() {
             </tr>
           </thead>
           <tbody>
-            {quotes.map((q) => {
-              const totals = computeQuoteTotals(q.quote_lines.map(toCalcLine));
-              return (
+            {quotes.map((q) => {              return (
                 <tr
                   key={q.id}
                   onClick={() => navigate(`/devis/${q.id}`)}
@@ -82,7 +79,7 @@ export default function QuotesPage() {
                     </span>
                   </td>
                   <td className="px-3 py-2 text-right font-medium">
-                    {formatEuros(totals.totalTtcCents)}
+                    {formatEuros(q.total_ttc_cents)}
                   </td>
                 </tr>
               );

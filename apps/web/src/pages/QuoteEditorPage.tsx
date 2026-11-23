@@ -163,6 +163,7 @@ export default function QuoteEditorPage() {
             discount_percent: c.discountPercent ?? 0,
           };
         }),
+        expectedTtcCents: totals.totalTtcCents, 
       });
       setSaved(true);
     } catch (err) {

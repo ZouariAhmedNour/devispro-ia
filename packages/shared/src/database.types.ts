@@ -125,14 +125,14 @@ isOneToOne: false
                   ]
                 },"quotes": {
                   Row: {
-                    "client_id": string | null,"company_id": string,"created_at": string,"created_by": string | null,"id": string,"notes": string | null,"status": Database["public"]['Enums']["quote_status"],"updated_at": string
+                    "client_id": string | null,"company_id": string,"created_at": string,"created_by": string | null,"id": string,"notes": string | null,"status": Database["public"]['Enums']["quote_status"],"total_ht_cents": number,"total_ttc_cents": number,"total_vat_cents": number,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "client_id"?: string | null,"company_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"notes"?: string | null,"status"?: Database["public"]['Enums']["quote_status"],"updated_at"?: string
+                    "client_id"?: string | null,"company_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"notes"?: string | null,"status"?: Database["public"]['Enums']["quote_status"],"total_ht_cents"?: number,"total_ttc_cents"?: number,"total_vat_cents"?: number,"updated_at"?: string
                   }
                   Update: {
-                    "client_id"?: string | null,"company_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"notes"?: string | null,"status"?: Database["public"]['Enums']["quote_status"],"updated_at"?: string
+                    "client_id"?: string | null,"company_id"?: string,"created_at"?: string,"created_by"?: string | null,"id"?: string,"notes"?: string | null,"status"?: Database["public"]['Enums']["quote_status"],"total_ht_cents"?: number,"total_ttc_cents"?: number,"total_vat_cents"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -161,8 +161,13 @@ isOneToOne: false
 "current_company_id":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"quote_totals":
+{ Args: { "p_quote_id": string }; Returns: {
+              "total_ht_cents": number,"total_ttc_cents": number,"total_vat_cents": number
+            }[]
+                           },
 "save_quote":
-{ Args: { "p_client_id"?: string,"p_lines": Json,"p_notes"?: string,"p_quote_id": string,"p_status": Database["public"]['Enums']["quote_status"] }; Returns: undefined
+{ Args: { "p_client_id"?: string,"p_expected_ttc_cents": number,"p_lines": Json,"p_notes"?: string,"p_quote_id": string,"p_status": Database["public"]['Enums']["quote_status"] }; Returns: undefined
                            }
           }
           Enums: {
