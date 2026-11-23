@@ -73,3 +73,9 @@ join (values ('Dépose ancien carrelage', 12.00, 1),
              ('Déplacement',              1.00, 3)) as q(label, qty, pos)
   on q.label = ci.label
 where ci.company_id = 'aaaaaaaa-0000-0000-0000-00000000000a';
+
+-- ---------- Totaux calculés par le serveur ----------
+update public.quotes q
+   set (total_ht_cents, total_vat_cents, total_ttc_cents) =
+       (select t.total_ht_cents, t.total_vat_cents, t.total_ttc_cents
+          from public.quote_totals(q.id) as t);

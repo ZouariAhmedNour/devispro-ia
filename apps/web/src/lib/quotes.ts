@@ -36,9 +36,7 @@ export function toCalcLine(line: {
 export async function listQuotes() {
   const { data, error } = await supabase
     .from("quotes")
-    .select(
-      "id, status, notes, created_at, clients(name), quote_lines(quantity, unit_price_cents, vat_rate, discount_percent)",
-    )
+    .select("id, status, notes, created_at, total_ttc_cents, clients(name)")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return data;
@@ -80,11 +78,13 @@ export async function saveQuote(input: {
   clientId: string | null;
   notes: string | null;
   lines: SaveQuoteLine[];
+  expectedTtcCents: number;
 }): Promise<void> {
   const { error } = await supabase.rpc("save_quote", {
     p_quote_id: input.id,
     p_status: input.status,
     p_lines: input.lines,
+    p_expected_ttc_cents: input.expectedTtcCents,
     p_client_id: input.clientId ?? undefined,
     p_notes: input.notes ?? undefined,
   });
