@@ -19,6 +19,7 @@ import {
   saveQuote,
   type QuoteStatus,
 } from "../lib/quotes";
+import { generateQuoteDraft } from "../lib/ai";
 import { toMessage } from "../lib/errors";
 
 // Une ligne telle qu'éditée à l'écran : les champs numériques restent des chaînes
@@ -60,6 +61,20 @@ function toCalc(line: EditorLine): QuoteLineCalcInput | null {
   return { quantity, unitPriceCents, vatRate: line.vatRate, discountPercent };
 }
 
+/** Ligne de catalogue -> ligne d'éditeur (prix et TVA viennent TOUJOURS du catalogue). */
+function lineFromCatalog(item: CatalogItem, quantity: number, note = ""): EditorLine {
+  return {
+    key: crypto.randomUUID(),
+    catalogItemId: item.id,
+    label: note ? `${item.label} (${note})` : item.label,
+    unit: item.unit,
+    quantity: toInput(quantity),
+    price: centsToInput(item.unit_price_cents),
+    vatRate: TvaRateSchema.parse(item.vat_rate),
+    discount: "",
+  };
+}
+
 export default function QuoteEditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -71,6 +86,13 @@ export default function QuoteEditorPage() {
   const [status, setStatus] = useState<QuoteStatus>("draft");
   const [lines, setLines] = useState<EditorLine[]>([]);
   const [selectedItemId, setSelectedItemId] = useState("");
+
+  // IA
+  const [aiText, setAiText] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiQuestions, setAiQuestions] = useState<string[]>([]);
+  const [aiRejected, setAiRejected] = useState(0);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -124,21 +146,35 @@ export default function QuoteEditorPage() {
   function addFromCatalog() {
     const item = catalog.find((i) => i.id === selectedItemId);
     if (!item) return;
-    setLines((ls) => [
-      ...ls,
-      {
-        key: crypto.randomUUID(),
-        catalogItemId: item.id,
-        label: item.label,
-        unit: item.unit,
-        quantity: "1",
-        price: centsToInput(item.unit_price_cents),
-        vatRate: TvaRateSchema.parse(item.vat_rate),
-        discount: "",
-      },
-    ]);
+    setLines((ls) => [...ls, lineFromCatalog(item, 1)]);
     setSelectedItemId("");
     setSaved(false);
+  }
+
+  async function handleGenerate() {
+    setAiBusy(true);
+    setAiError(null);
+    setAiQuestions([]);
+    setAiRejected(0);
+    try {
+      const draft = await generateQuoteDraft(aiText);
+
+      // On retrouve chaque prestation dans le catalogue chargé : prix et TVA viennent de là
+      const newLines = draft.lines.flatMap((l) => {
+        const item = catalog.find((i) => i.id === l.catalog_item_id);
+        return item ? [lineFromCatalog(item, l.quantity, l.note)] : [];
+      });
+
+      setLines((ls) => [...ls, ...newLines]);
+      setAiQuestions(draft.questions);
+      setAiRejected(draft.rejected.length);
+      if (!notes.trim()) setNotes(aiText.trim().slice(0, 120));
+      setSaved(false);
+    } catch (err) {
+      setAiError(toMessage(err));
+    } finally {
+      setAiBusy(false);
+    }
   }
 
   async function handleSave() {
@@ -163,7 +199,7 @@ export default function QuoteEditorPage() {
             discount_percent: c.discountPercent ?? 0,
           };
         }),
-        expectedTtcCents: totals.totalTtcCents, 
+        expectedTtcCents: totals.totalTtcCents,
       });
       setSaved(true);
     } catch (err) {
@@ -240,6 +276,50 @@ export default function QuoteEditorPage() {
         </label>
       </div>
 
+      {/* Génération IA */}
+      <div className="space-y-3 rounded-xl border border-violet-200 bg-violet-50 p-4">
+        <h2 className="font-semibold text-violet-900">✨ Générer avec l'IA</h2>
+        <textarea
+          value={aiText}
+          onChange={(e) => setAiText(e.target.value)}
+          rows={3}
+          placeholder="Décris le chantier, ex. : Salle de bain de 12 m², enlever l'ancien carrelage et poser du carrelage neuf au sol."
+          className="w-full rounded border bg-white px-3 py-2 text-sm"
+        />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleGenerate}
+            disabled={aiBusy || aiText.trim().length < 3}
+            className="rounded bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50"
+          >
+            {aiBusy ? "Génération…" : "Générer les lignes"}
+          </button>
+          <span className="text-xs text-violet-800">
+            L'IA choisit uniquement dans ton catalogue. Les prix viennent toujours de ton catalogue.
+          </span>
+        </div>
+
+        {aiError && <p className="text-sm text-red-600">{aiError}</p>}
+
+        {aiQuestions.length > 0 && (
+          <div className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            <p className="font-medium">L'IA a besoin de précisions :</p>
+            <ul className="mt-1 list-disc pl-5">
+              {aiQuestions.map((q) => (
+                <li key={q}>{q}</li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs">Complète ta description puis relance la génération.</p>
+          </div>
+        )}
+
+        {aiRejected > 0 && (
+          <p className="text-xs text-slate-600">
+            {aiRejected} proposition(s) de l'IA écartée(s) car absente(s) de ton catalogue.
+          </p>
+        )}
+      </div>
+
       {/* Lignes */}
       <div className="overflow-x-auto rounded-xl border bg-white">
         <table className="w-full text-sm">
@@ -259,7 +339,7 @@ export default function QuoteEditorPage() {
             {lines.length === 0 && (
               <tr>
                 <td colSpan={8} className="px-3 py-4 text-center text-slate-500">
-                  Aucune ligne. Ajoute une prestation depuis ton catalogue.
+                  Aucune ligne. Utilise l'IA ou ajoute une prestation depuis ton catalogue.
                 </td>
               </tr>
             )}
@@ -328,7 +408,7 @@ export default function QuoteEditorPage() {
           </tbody>
         </table>
 
-        {/* Ajout depuis le catalogue */}
+        {/* Ajout manuel depuis le catalogue */}
         <div className="flex gap-2 border-t p-3">
           <select
             value={selectedItemId}
