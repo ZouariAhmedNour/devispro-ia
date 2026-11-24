@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import DictationButton from "../components/DictationButton";
 import {
   TvaRateSchema,
   centsToInput,
@@ -287,6 +288,9 @@ export default function QuoteEditorPage() {
           className="w-full rounded border bg-white px-3 py-2 text-sm"
         />
         <div className="flex items-center gap-3">
+          <DictationButton
+            onText={(text) => setAiText((current) => (current ? `${current} ${text}` : text))}
+          />
           <button
             onClick={handleGenerate}
             disabled={aiBusy || aiText.trim().length < 3}

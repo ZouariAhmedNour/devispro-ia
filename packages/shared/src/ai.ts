@@ -14,3 +14,6 @@ export const QuoteDraftSchema = z.object({
 });
 
 export type QuoteDraft = z.infer<typeof QuoteDraftSchema>;
+
+/** Ce que renvoie l'Edge Function transcribe. */
+export const TranscriptionSchema = z.object({ text: z.string() });
