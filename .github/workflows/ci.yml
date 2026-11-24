@@ -39,3 +39,5 @@ jobs:
           deno-version: 2.9.8
       - run: deno check --config supabase/functions/generate-quote/deno.json supabase/functions/generate-quote/index.ts
       - run: deno test --config supabase/functions/generate-quote/deno.json supabase/functions/generate-quote/
+      - run: deno check --config supabase/functions/transcribe/deno.json supabase/functions/transcribe/index.ts
+      - run: deno test --config supabase/functions/transcribe/deno.json supabase/functions/transcribe/
