@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useAuth } from "../auth/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 import { transcribeRecording } from "../lib/ai";
 import { toMessage } from "../lib/errors";
 
