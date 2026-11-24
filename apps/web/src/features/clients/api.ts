@@ -1,5 +1,5 @@
 import type { Tables, TablesInsert, TablesUpdate } from "@devispro/shared";
-import { supabase } from "./supabase";
+import { supabase } from "@/lib/supabase";
 
 export type Client = Tables<"clients">;
 export type ClientInput = Pick<TablesInsert<"clients">, "name" | "email" | "phone" | "address">;

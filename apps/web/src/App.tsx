@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router";
 
-import CatalogPage from "./pages/CatalogPage";
-import ClientsPage from "./pages/ClientsPage";
+import CatalogPage from "@/features/catalog/CatalogPage";
+import ClientsPage from "@/features/clients/ClientsPage";
 import QuotesPage from "./pages/QuotesPage";
 import QuoteEditorPage from "./pages/QuoteEditorPage";
 import LoginPage from "./features/auth/LoginPage";
