@@ -1,20 +1,21 @@
 import { useRef, useState } from "react";
+import { Loader2, Mic, Square } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/useAuth";
-import { transcribeRecording } from "../lib/ai";
-import { toMessage } from "../lib/errors";
+import { toMessage } from "@/lib/errors";
+import { transcribeRecording } from "../ai";
 
 type State = "idle" | "recording" | "transcribing";
 
 /** Bouton micro : enregistre, envoie à la transcription, renvoie le texte. */
-export default function DictationButton({ onText }: { onText: (text: string) => void }) {
+export function DictationButton({ onText }: { onText: (text: string) => void }) {
   const { profile } = useAuth();
   const [state, setState] = useState<State>("idle");
-  const [error, setError] = useState<string | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
   async function start() {
-    setError(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       // Chrome/Edge/Firefox : webm ; Safari : mp4
@@ -33,9 +34,9 @@ export default function DictationButton({ onText }: { onText: (text: string) => 
           const audio = new Blob(chunksRef.current, { type: mimeType });
           const text = await transcribeRecording(audio, profile.companyId);
           if (text) onText(text);
-          else setError("Rien n'a été compris, réessaie en parlant plus près du micro.");
+          else toast.warning("Rien n'a été compris, réessaie en parlant plus près du micro.");
         } catch (err) {
-          setError(toMessage(err));
+          toast.error("Transcription impossible", { description: toMessage(err) });
         } finally {
           setState("idle");
         }
@@ -45,35 +46,23 @@ export default function DictationButton({ onText }: { onText: (text: string) => 
       recorder.start();
       setState("recording");
     } catch {
-      setError("Accès au micro refusé ou indisponible.");
+      toast.error("Accès au micro refusé ou indisponible.");
     }
   }
 
-  function stop() {
-    recorderRef.current?.stop();
+  if (state === "recording") {
+    return (
+      <Button type="button" variant="destructive" className="animate-pulse" onClick={() => recorderRef.current?.stop()}>
+        <Square className="size-4" />
+        Arrêter
+      </Button>
+    );
   }
 
   return (
-    <div className="flex items-center gap-2">
-      {state === "recording" ? (
-        <button
-          type="button"
-          onClick={stop}
-          className="animate-pulse rounded bg-red-600 px-4 py-2 text-sm font-medium text-white"
-        >
-          ⏹ Arrêter la dictée
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={start}
-          disabled={state === "transcribing" || !profile}
-          className="rounded border border-violet-300 bg-white px-4 py-2 text-sm font-medium text-violet-800 hover:bg-violet-100 disabled:opacity-50"
-        >
-          {state === "transcribing" ? "Transcription…" : "🎤 Dicter"}
-        </button>
-      )}
-      {error && <span className="text-xs text-red-600">{error}</span>}
-    </div>
+    <Button type="button" variant="outline" onClick={start} disabled={state === "transcribing" || !profile}>
+      {state === "transcribing" ? <Loader2 className="size-4 animate-spin" /> : <Mic className="size-4" />}
+      {state === "transcribing" ? "Transcription…" : "Dicter"}
+    </Button>
   );
 }

@@ -1,6 +1,6 @@
 import { QuoteDraftSchema, TranscriptionSchema, type QuoteDraft } from "@devispro/shared";
-import { supabase } from "./supabase";
-import { toFunctionError } from "./functions";
+import { supabase } from "@/lib/supabase";
+import { toFunctionError } from "@/lib/functions";
 
 /** Texte -> brouillon de devis. */
 export async function generateQuoteDraft(transcript: string): Promise<QuoteDraft> {
