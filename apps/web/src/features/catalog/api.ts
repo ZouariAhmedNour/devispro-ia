@@ -1,5 +1,5 @@
 import type { Tables, TablesInsert, TablesUpdate } from "@devispro/shared";
-import { supabase } from "./supabase";
+import { supabase } from "@/lib/supabase";
 
 export type CatalogItem = Tables<"catalog_items">;
 export type CatalogItemInput = Pick<
@@ -7,7 +7,7 @@ export type CatalogItemInput = Pick<
   "label" | "unit" | "unit_price_cents" | "vat_rate"
 >;
 
-// Pas de filtre sur company_id : la RLS ne renvoie que les lignes de l'entreprise connectée.
+// Pas de filtre company_id : la RLS ne renvoie que l'entreprise connectée.
 export async function listCatalogItems(): Promise<CatalogItem[]> {
   const { data, error } = await supabase
     .from("catalog_items")
@@ -18,7 +18,6 @@ export async function listCatalogItems(): Promise<CatalogItem[]> {
   return data;
 }
 
-// Pas de company_id envoyé : la valeur par défaut en base le déduit de l'utilisateur.
 export async function createCatalogItem(input: CatalogItemInput): Promise<void> {
   const { error } = await supabase.from("catalog_items").insert(input);
   if (error) throw error;

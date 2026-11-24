@@ -11,8 +11,8 @@ import {
   type QuoteLineCalcInput,
   type TvaRate,
 } from "@devispro/shared";
-import { listCatalogItems, type CatalogItem } from "../lib/catalog";
-import { listClients, type Client } from "../lib/clients";
+import { listCatalogItems, type CatalogItem } from "@/features/catalog/api";
+import { listClients, type Client } from "@/features/clients/api";
 import {
   STATUS_LABELS,
   deleteQuote,
