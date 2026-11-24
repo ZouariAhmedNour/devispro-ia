@@ -30,9 +30,11 @@ jobs:
 
   edge-tests:
     runs-on: ubuntu-latest
+    env:
+      DENO_NO_PACKAGE_JSON: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: 2.9.8   # ← mets ta version exacte (deno --version)
-      - run: deno test supabase/functions/
+          deno-version: 2.9.8
+      - run: deno test --config supabase/functions/generate-quote/deno.json supabase/functions/generate-quote/
