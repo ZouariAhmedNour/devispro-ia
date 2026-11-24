@@ -104,6 +104,23 @@ Chaque décision suit le même format : **contexte**, **choix**, **alternatives 
 - **Choix** : `apps/web`, `apps/mobile` et `packages/shared` (calculs, schémas Zod, types générés).
 - **Conséquences** : une seule implémentation des calculs et des contrats d'API pour toutes les applications.
 
+## 18. Front : architecture par fonctionnalité (feature-based)
+
+- **Choix** : `src/features/{auth,catalog,clients,quotes}`, chacun avec `api.ts` (Supabase), `hooks.ts` (état serveur), `components/` et sa page. Les briques transverses vivent dans `components/common` et `lib/`.
+- **Alternatives écartées** : un rangement par type (`pages/`, `components/`, `services/`), où une fonctionnalité est éparpillée dans 4 dossiers.
+- **Conséquences** : une fonctionnalité se lit, se modifie et se supprime au même endroit.
+
+## 19. TanStack Query pour l'état serveur
+
+- **Choix** : chaque lecture passe par `useQuery`, chaque écriture par `useMutation`, qui invalide les clés de cache concernées.
+- **Conséquences** : plus de `useEffect` de chargement ni de `refresh()` manuel. Les listes se mettent à jour seules, les pages déjà visitées s'affichent instantanément, et le cache est vidé à la déconnexion pour qu'aucune donnée ne passe d'un utilisateur à l'autre.
+
+## 20. Logique séparée de l'affichage (éditeur de devis)
+
+- **Choix** : le hook `useQuoteEditor` porte l'état et les règles. Les fonctions pures (`editor-lines.ts`) sont testées avec Vitest. Les composants (`QuoteHeaderForm`, `AiAssistantPanel`, `QuoteLinesTable`, `QuoteTotalsCard`) ne font qu'afficher et déclencher des actions.
+- **UI** : shadcn/ui (Radix + Tailwind) pour des composants accessibles dont le code fait partie du projet.
+- **Conséquences** : un fichier de plus de 400 lignes est devenu plusieurs composants courts, et la logique de l'éditeur pourra être réutilisée en partie sur mobile.
+
 ---
 
 ## Incidents rencontrés et leçons

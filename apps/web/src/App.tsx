@@ -2,8 +2,8 @@ import { Navigate, Route, Routes } from "react-router";
 
 import CatalogPage from "@/features/catalog/CatalogPage";
 import ClientsPage from "@/features/clients/ClientsPage";
-import QuotesPage from "./pages/QuotesPage";
-import QuoteEditorPage from "./pages/QuoteEditorPage";
+import QuotesPage from "@/features/quotes/QuotesPage";
+import QuoteEditorPage from "@/features/quotes/QuoteEditorPage";
 import LoginPage from "./features/auth/LoginPage";
 import { RequireAuth } from "./features/auth/RequireAuth";
 import AppLayout from "./components/layout/AppLayout";

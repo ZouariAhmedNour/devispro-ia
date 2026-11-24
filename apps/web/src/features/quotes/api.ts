@@ -1,36 +1,5 @@
-import { TvaRateSchema, type Enums, type QuoteLineCalcInput } from "@devispro/shared";
-import { supabase } from "./supabase";
-
-export type QuoteStatus = Enums<"quote_status">;
-
-export const STATUS_LABELS: Record<QuoteStatus, string> = {
-  draft: "Brouillon",
-  sent: "Envoyé",
-  accepted: "Accepté",
-  rejected: "Refusé",
-};
-
-export const STATUS_COLORS: Record<QuoteStatus, string> = {
-  draft: "bg-slate-100 text-slate-700",
-  sent: "bg-blue-100 text-blue-700",
-  accepted: "bg-green-100 text-green-700",
-  rejected: "bg-red-100 text-red-700",
-};
-
-/** Convertit une ligne de la base au format attendu par computeQuoteTotals. */
-export function toCalcLine(line: {
-  quantity: number;
-  unit_price_cents: number;
-  vat_rate: number;
-  discount_percent?: number;
-}): QuoteLineCalcInput {
-  return {
-    quantity: line.quantity,
-    unitPriceCents: line.unit_price_cents,
-    vatRate: TvaRateSchema.parse(line.vat_rate),
-    discountPercent: line.discount_percent ?? 0,
-  };
-}
+import { supabase } from "@/lib/supabase";
+import type { QuoteStatus } from "./status";
 
 // ---------- Liste ----------
 export async function listQuotes() {
@@ -50,7 +19,7 @@ export async function createDraftQuote(): Promise<string> {
   return data.id;
 }
 
-// ---------- Éditeur ----------
+// ---------- Détail ----------
 export async function getQuote(id: string) {
   const { data, error } = await supabase
     .from("quotes")
@@ -62,6 +31,10 @@ export async function getQuote(id: string) {
   return data;
 }
 
+export type QuoteWithLines = Awaited<ReturnType<typeof getQuote>>;
+export type QuoteLineRow = QuoteWithLines["quote_lines"][number];
+
+// ---------- Enregistrement ----------
 export type SaveQuoteLine = {
   catalog_item_id: string | null;
   label: string;
@@ -72,14 +45,16 @@ export type SaveQuoteLine = {
   discount_percent: number;
 };
 
-export async function saveQuote(input: {
+export type SaveQuoteInput = {
   id: string;
   status: QuoteStatus;
   clientId: string | null;
   notes: string | null;
   lines: SaveQuoteLine[];
   expectedTtcCents: number;
-}): Promise<void> {
+};
+
+export async function saveQuote(input: SaveQuoteInput): Promise<void> {
   const { error } = await supabase.rpc("save_quote", {
     p_quote_id: input.id,
     p_status: input.status,
