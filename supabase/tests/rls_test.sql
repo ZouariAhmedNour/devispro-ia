@@ -102,9 +102,10 @@ set local role anon;
 select set_config('request.jwt.claims', '', true);
 
 -- 9
-select is_empty(
+select throws_ok(
   $$ select id from public.quotes $$,
-  'Un visiteur non connecté ne voit aucun devis');
+  '42501', null,
+  'Un visiteur non connecté n''a aucun accès à la table des devis');
 
 -- =====================================================
 -- On devient Bob (entreprise B) : symétrie
