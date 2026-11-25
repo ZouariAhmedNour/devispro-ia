@@ -6,6 +6,9 @@ import { useAuth } from "@/features/auth/useAuth";
 import { colors, spacing } from "@/theme";
 import { useQuotes } from "./hooks";
 import { QuoteCard } from "./components/QuoteCard";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { OfflineBanner } from "@/components/ui/OfflineBanner";
+
 
 export default function QuotesScreen() {
     const insets = useSafeAreaInsets();
@@ -28,7 +31,11 @@ export default function QuotesScreen() {
             <FlatList
                 data={quotes}
                 keyExtractor={(q) => q.id}
-                renderItem={({ item }) => <QuoteCard quote={item} />}
+                renderItem={({ item }) => (
+          <Pressable onPress={() => router.push(`/quote/${item.id}`)}>
+            <QuoteCard quote={item} />
+          </Pressable>
+        )}
                 contentContainerStyle={styles.list}
                 refreshControl={
                     <RefreshControl
@@ -38,18 +45,20 @@ export default function QuotesScreen() {
                         }}
                     />
                 } ListHeaderComponent={
-                    <View style={styles.header}>
-                        <Text style={styles.company}>{profile?.companyName ?? ""}</Text>
-                        {error ? <Text style={styles.error}>Impossible de charger les devis.</Text> : null}
-                    </View>
-                }
+          <View style={styles.header}>
+            <OfflineBanner />
+            <Text style={styles.company}>{profile?.companyName ?? ""}</Text>
+          </View>
+        }
                 ListEmptyComponent={
-                    isLoading ? (
-                        <ActivityIndicator style={{ marginTop: spacing(10) }} />
-                    ) : (
-                        <Text style={styles.empty}>Aucun devis pour l'instant.</Text>
-                    )
-                }
+          isLoading ? (
+            <ActivityIndicator style={{ marginTop: spacing(10) }} />
+          ) : error ? (
+            <ErrorState message="Impossible de charger les devis." onRetry={() => void refetch()} />
+          ) : (
+            <Text style={styles.empty}>Aucun devis pour l'instant.</Text>
+          )
+        }
             />
 
             <View style={[styles.footer, { paddingBottom: insets.bottom + spacing(3) }]}>
