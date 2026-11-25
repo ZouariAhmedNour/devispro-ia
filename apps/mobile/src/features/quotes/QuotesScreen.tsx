@@ -1,5 +1,5 @@
 import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/features/auth/useAuth";
@@ -56,7 +56,7 @@ export default function QuotesScreen() {
                 <Button
                     title="+ Nouveau devis"
                     variant="violet"
-                    onPress={() => Alert.alert("Bientôt", "La création de devis arrive à la partie 4.2.")}
+                    onPress={() => router.push("/new")}
                 />
             </View>
         </View>
