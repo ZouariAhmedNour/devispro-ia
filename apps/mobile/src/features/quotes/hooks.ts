@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createDraftQuote, deleteQuote, listQuotes, saveQuote, type SaveQuoteInput } from "./api";
 import { generateQuoteDraft } from "./ai";
+import type { QuoteStatus } from "@devispro/shared";
+import { getQuote, updateQuoteStatus } from "./api";
 
 export const quoteKeys = {
   all: ["quotes"] as const,
@@ -29,6 +31,18 @@ export function useCreateQuote() {
       }
       return id;
     },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.all }),
+  });
+}
+
+export function useQuote(id: string) {
+  return useQuery({ queryKey: [...quoteKeys.all, "detail", id], queryFn: () => getQuote(id) });
+}
+
+export function useUpdateQuoteStatus(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (status: QuoteStatus) => updateQuoteStatus(id, status),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.all }),
   });
 }

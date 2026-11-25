@@ -22,6 +22,8 @@ import { useNewQuote } from "./useNewQuote";
 import { ClientPicker } from "./components/ClientPicker";
 import { DictationButton } from "./components/DictationButton";
 import { DraftLineRow } from "./components/DraftLineRow";
+import { OfflineBanner } from "@/components/ui/OfflineBanner";
+
 
 export default function NewQuoteScreen() {
   const insets = useSafeAreaInsets();

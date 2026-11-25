@@ -56,3 +56,24 @@ export async function saveQuote(input: SaveQuoteInput): Promise<void> {
   });
   if (error) throw error;
 }
+
+// ---------- Détail ----------
+export async function getQuote(id: string) {
+  const { data, error } = await supabase
+    .from("quotes")
+    .select(
+      "id, status, notes, created_at, total_ht_cents, total_vat_cents, total_ttc_cents, clients(name, phone, email), quote_lines(id, label, unit, quantity, unit_price_cents, vat_rate, discount_percent, position)",
+    )
+    .eq("id", id)
+    .order("position", { referencedTable: "quote_lines" })
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export type QuoteDetail = Awaited<ReturnType<typeof getQuote>>;
+
+export async function updateQuoteStatus(id: string, status: QuoteStatus): Promise<void> {
+  const { error } = await supabase.from("quotes").update({ status }).eq("id", id);
+  if (error) throw error;
+}
