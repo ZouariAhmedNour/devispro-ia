@@ -41,3 +41,5 @@ jobs:
       - run: deno test --config supabase/functions/generate-quote/deno.json supabase/functions/generate-quote/
       - run: deno check --config supabase/functions/transcribe/deno.json supabase/functions/transcribe/index.ts
       - run: deno test --config supabase/functions/transcribe/deno.json supabase/functions/transcribe/
+      - run: deno check --config supabase/functions/quote-pdf/deno.json supabase/functions/quote-pdf/index.ts
+      - run: deno test --config supabase/functions/quote-pdf/deno.json supabase/functions/quote-pdf/

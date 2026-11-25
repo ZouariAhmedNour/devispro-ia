@@ -121,6 +121,19 @@ Chaque décision suit le même format : **contexte**, **choix**, **alternatives 
 - **UI** : shadcn/ui (Radix + Tailwind) pour des composants accessibles dont le code fait partie du projet.
 - **Conséquences** : un fichier de plus de 400 lignes est devenu plusieurs composants courts, et la logique de l'éditeur pourra être réutilisée en partie sur mobile.
 
+## 21. Mobile : saisie terrain, édition fine sur le web
+
+- **Choix** : l'app Expo sert à créer un devis sur le chantier (dictée, génération IA, quantités) et à suivre son statut. Les prix, remises et TVA s'éditent sur le web.
+- **Réutilisation** : mêmes Edge Functions (`generate-quote`, `transcribe`), même RPC `save_quote` (totaux revérifiés côté serveur), même calcul `computeQuoteTotals` et mêmes schémas Zod via `packages/shared`.
+- **Réseau** : TanStack Query est relié à NetInfo (`onlineManager`) et à l'état de l'app (`focusManager`). Hors ligne, les requêtes sont mises en pause puis relancées automatiquement, et une bannière prévient l'utilisateur.
+
+## 22. PDF généré côté serveur, à partir de la base
+
+- **Choix** : l'Edge Function `quote-pdf` lit le devis via la RLS, vérifie que les lignes redonnent au centime près les totaux stockés par `save_quote`, génère le PDF (pdf-lib) et le range dans un bucket privé (`quotes/{company_id}/…`). Elle renvoie un lien signé valable 7 jours.
+- **Alternatives écartées** : générer le PDF dans le navigateur, ce qui revient à faire confiance à l'affichage local.
+- **Détail technique** : formatage manuel des montants, parce que `Intl` insère des espaces insécables absents de l'encodage des polices PDF standard (testé).
+- **Limite assumée** : mentions simplifiées pour la démo. Un vrai devis d'artisan exige aussi, selon le métier, l'assurance décennale, les conditions de paiement, etc.
+
 ---
 
 ## Incidents rencontrés et leçons
