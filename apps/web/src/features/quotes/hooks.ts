@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { toMessage } from "@/lib/errors";
 import { createDraftQuote, deleteQuote, getQuote, listQuotes, saveQuote } from "./api";
 import { generateQuoteDraft } from "./ai";
+import { generateQuotePdf } from "./pdf";
 
 export const quoteKeys = {
   all: ["quotes"] as const,
@@ -56,5 +57,12 @@ export function useGenerateDraft() {
   return useMutation({
     mutationFn: (transcript: string) => generateQuoteDraft(transcript),
     onError: (error) => toast.error("Génération impossible", { description: toMessage(error) }),
+  });
+}
+
+export function useQuotePdf() {
+  return useMutation({
+    mutationFn: (quoteId: string) => generateQuotePdf(quoteId),
+    onError: (error) => toast.error("PDF impossible", { description: toMessage(error) }),
   });
 }

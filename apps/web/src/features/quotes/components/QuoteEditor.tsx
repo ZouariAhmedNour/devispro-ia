@@ -1,17 +1,18 @@
 import { Link, useNavigate } from "react-router";
-import { ArrowLeft, Loader2, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, FileDown, Loader2, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import type { CatalogItem } from "@/features/catalog/api";
 import type { Client } from "@/features/clients/api";
 import type { QuoteWithLines } from "../api";
-import { useDeleteQuote, useSaveQuote } from "../hooks";
+import { useDeleteQuote, useQuotePdf, useSaveQuote } from "../hooks";
 import { useQuoteEditor } from "../useQuoteEditor";
 import { AiAssistantPanel } from "./AiAssistantPanel";
 import { QuoteHeaderForm } from "./QuoteHeaderForm";
 import { QuoteLinesTable } from "./QuoteLinesTable";
 import { QuoteTotalsCard } from "./QuoteTotalsCard";
 import { StatusBadge } from "./StatusBadge";
+
 
 export function QuoteEditor({
   quote,
@@ -26,6 +27,20 @@ export function QuoteEditor({
   const editor = useQuoteEditor(quote, catalog);
   const save = useSaveQuote();
   const remove = useDeleteQuote();
+
+   const pdf = useQuotePdf();
+
+  function handlePdf() {
+    // On ouvre l'onglet tout de suite (sinon le navigateur bloque la fenêtre ouverte après un appel réseau)
+    const win = window.open("", "_blank");
+    pdf.mutate(quote.id, {
+      onSuccess: (url) => {
+        if (win) win.location.href = url;
+        else window.location.href = url;
+      },
+      onError: () => win?.close(),
+    });
+  }
 
   function handleSave() {
     if (editor.hasInvalid) return;
@@ -66,6 +81,15 @@ export function QuoteEditor({
               </Button>
             }
           />
+           <Button
+            variant="outline"
+            onClick={handlePdf}
+            disabled={pdf.isPending || editor.dirty || editor.lines.length === 0}
+            title={editor.dirty ? "Enregistre d'abord le devis" : "Télécharger le PDF"}
+          >
+            {pdf.isPending ? <Loader2 className="size-4 animate-spin" /> : <FileDown className="size-4" />}
+            PDF
+          </Button>
           <Button onClick={handleSave} disabled={save.isPending || editor.hasInvalid}>
             {save.isPending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
             Enregistrer

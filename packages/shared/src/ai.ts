@@ -17,3 +17,10 @@ export type QuoteDraft = z.infer<typeof QuoteDraftSchema>;
 
 /** Ce que renvoie l'Edge Function transcribe. */
 export const TranscriptionSchema = z.object({ text: z.string() });
+
+/** Ce que renvoie l'Edge Function quote-pdf. */
+export const QuotePdfSchema = z.object({
+  url: z.string().url(),
+  path: z.string(),
+  expiresInSeconds: z.number(),
+});
