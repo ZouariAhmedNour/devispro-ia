@@ -3,6 +3,7 @@ import { createDraftQuote, deleteQuote, listQuotes, saveQuote, type SaveQuoteInp
 import { generateQuoteDraft } from "./ai";
 import type { QuoteStatus } from "@devispro/shared";
 import { getQuote, updateQuoteStatus } from "./api";
+import { generateQuotePdf } from "./pdf";
 
 export const quoteKeys = {
   all: ["quotes"] as const,
@@ -45,4 +46,8 @@ export function useUpdateQuoteStatus(id: string) {
     mutationFn: (status: QuoteStatus) => updateQuoteStatus(id, status),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.all }),
   });
+}
+
+export function useQuotePdf() {
+  return useMutation({ mutationFn: (quoteId: string) => generateQuotePdf(quoteId) });
 }
