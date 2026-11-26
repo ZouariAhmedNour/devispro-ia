@@ -147,6 +147,11 @@ Chaque décision suit le même format : **contexte**, **choix**, **alternatives 
 - **Pourquoi simuler l'IA** : tests gratuits, rapides et déterministes, qui testent l'application et non le modèle. La logique IA elle-même est couverte par les tests Deno.
 - **Pyramide de tests** : Vitest (calculs, logique) → pgTAP (RLS, totaux SQL) → Deno (Edge Functions) → Playwright (parcours utilisateur), soit 4 jobs CI obligatoires.
 
+## 25. Distribution mobile : APK interne via EAS
+
+- **Choix** : profil EAS `preview` (APK, distribution interne) pour la démo ; profil `production` prêt pour le Play Store (AAB, version incrémentée automatiquement).
+- **Variables** : les valeurs publiques (URL Supabase, clé publishable) sont déclarées dans les variables d'environnement EAS, car le `.env` local n'est pas envoyé au serveur de build. Aucune clé secrète n'est embarquée dans l'app, un APK pouvant être décompilé.
+- **Limite** : pas de build iOS, la distribution interne exigeant un compte Apple Developer payant.
 ---
 
 ## Incidents rencontrés et leçons
