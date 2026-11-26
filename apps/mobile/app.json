@@ -1,23 +1,31 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "DevisPro IA",
+    "slug": "devispro-ia",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "scheme": "devispro",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.zouari.devispro"
     },
     "android": {
+      "package": "com.zouari.devispro",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -25,8 +33,24 @@
     "plugins": [
       "expo-router",
       "expo-status-bar",
-      "expo-audio",
-      ["expo-audio", { "microphonePermission": "DevisPro utilise le micro pour dicter tes devis sur le chantier." }]
-    ]
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "DevisPro utilise le micro pour dicter tes devis sur le chantier."
+        }
+      ],
+      "expo-asset"
+    ],
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "0cd74db8-6f9d-4d5f-b5d1-1342ced5f03b"
+      }
+    },
+    "owner": "lezouaris-team"
   }
 }
