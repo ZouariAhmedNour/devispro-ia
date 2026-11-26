@@ -53,11 +53,11 @@
 ### Mobile — saisie sur le chantier
 
 <p align="center">
-  <img src="assets/mobile-liste.png" width="30%" alt="Liste des devis sur mobile" />
+  <img src="assets/mobile-liste.jpg" width="30%" alt="Liste des devis sur mobile" />
   &nbsp;
-  <img src="assets/mobile-nouveau-devis.png" width="30%" alt="Nouveau devis : dictée, génération IA, total en direct" />
+  <img src="assets/mobile-nouveau-devis.jpg" width="30%" alt="Nouveau devis : dictée, génération IA, total en direct" />
   &nbsp;
-  <img src="assets/mobile-detail.png" width="30%" alt="Détail d'un devis : statut, lignes, envoi et PDF" />
+  <img src="assets/mobile-detail.jpg" width="30%" alt="Détail d'un devis : statut, lignes, envoi et PDF" />
 </p>
 <p align="center">
   <sub>Liste des devis · Nouveau devis dicté et généré par l'IA · Détail, envoi et PDF</sub>
