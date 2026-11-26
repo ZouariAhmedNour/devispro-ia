@@ -140,6 +140,13 @@ Chaque décision suit le même format : **contexte**, **choix**, **alternatives 
 - **Alternatives écartées (pour l'instant)** : Resend ou un autre service transactionnel. Ils exigent un domaine vérifié, et le client répondrait à une adresse `noreply` au lieu de l'artisan.
 - **Évolution possible** : envoi via Resend avec suivi d'ouverture, une fois un domaine configuré.
 
+## 24. Tests de bout en bout avec Playwright, IA simulée
+
+- **Choix** : Playwright pilote un vrai navigateur contre un Supabase local (seed de démo). L'Edge Function `generate-quote` est interceptée au niveau réseau et renvoie une réponse fixe construite avec les vrais identifiants du catalogue.
+- **Ce que ça prouve** : connexion, isolation entre entreprises visible dans l'interface, génération → calcul → enregistrement → persistance, affichage des questions et des rejets de l'IA.
+- **Pourquoi simuler l'IA** : tests gratuits, rapides et déterministes, qui testent l'application et non le modèle. La logique IA elle-même est couverte par les tests Deno.
+- **Pyramide de tests** : Vitest (calculs, logique) → pgTAP (RLS, totaux SQL) → Deno (Edge Functions) → Playwright (parcours utilisateur), soit 4 jobs CI obligatoires.
+
 ---
 
 ## Incidents rencontrés et leçons
