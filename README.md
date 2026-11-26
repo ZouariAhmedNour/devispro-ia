@@ -156,17 +156,52 @@ erDiagram
     companies ||--o{ profiles : "emploie"
     companies ||--o{ catalog_items : "propose"
     companies ||--o{ clients : "a"
-    companies ||--o{ quotes : "émet"
-    clients ||--o{ quotes : "reçoit"
+    companies ||--o{ quotes : "emet"
+    clients ||--o{ quotes : "recoit"
     quotes ||--o{ quote_lines : "contient"
-    catalog_items ||--o{ quote_lines : "copiée dans"
+    catalog_items ||--o{ quote_lines : "copiee dans"
 
-    companies { uuid id PK; text name; text siret }
-    profiles { uuid id PK "= auth.users.id"; uuid company_id FK }
-    catalog_items { uuid id PK; uuid company_id FK; text label; text unit; int unit_price_cents; numeric vat_rate; bool active }
-    clients { uuid id PK; uuid company_id FK; text name; text email }
-    quotes { uuid id PK; uuid company_id FK; uuid client_id FK; enum status; int total_ttc_cents }
-    quote_lines { uuid id PK; uuid quote_id FK; uuid company_id FK; text label; numeric quantity; int unit_price_cents; numeric vat_rate; numeric discount_percent }
+    companies {
+        uuid id PK
+        text name
+        text siret
+    }
+    profiles {
+        uuid id PK "= auth.users.id"
+        uuid company_id FK
+    }
+    catalog_items {
+        uuid id PK
+        uuid company_id FK
+        text label
+        text unit
+        int unit_price_cents
+        numeric vat_rate
+        bool active
+    }
+    clients {
+        uuid id PK
+        uuid company_id FK
+        text name
+        text email
+    }
+    quotes {
+        uuid id PK
+        uuid company_id FK
+        uuid client_id FK
+        enum status
+        int total_ttc_cents
+    }
+    quote_lines {
+        uuid id PK
+        uuid quote_id FK
+        uuid company_id FK
+        text label
+        numeric quantity
+        int unit_price_cents
+        numeric vat_rate
+        numeric discount_percent
+    }
 ```
 
 Chaque table porte un `company_id`, filtré par la **RLS**. Les clés étrangères sont **composites** (`(id, company_id)`), car les contrôles de clé étrangère ignorent la RLS. Les lignes de devis **copient** le prix du catalogue : modifier un tarif ne change pas les anciens devis.
