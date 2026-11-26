@@ -89,6 +89,12 @@ export function useQuoteEditor(quote: QuoteWithLines, catalog: CatalogItem[]) {
         expectedTtcCents: totals.totalTtcCents,
       };
     },
+
+     /** Aligne le statut affiché sur la base, sans le compter comme modification. */
+    syncStatus(value: QuoteStatus) {
+      setStatusState(value);
+    },
+    
     markSaved() {
       setDirty(false);
     },

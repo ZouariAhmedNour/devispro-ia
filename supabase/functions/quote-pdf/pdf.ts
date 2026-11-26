@@ -231,5 +231,4 @@ export async function buildQuotePdf(d: PdfQuoteData): Promise<Uint8Array> {
     });
   });
 
-  return await pdf.save();
-}
+ return await pdf.save({ useObjectStreams: false });}

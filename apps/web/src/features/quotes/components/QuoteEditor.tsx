@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import { ArrowLeft, FileDown, Loader2, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, FileDown, Loader2, Save, Send, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import type { CatalogItem } from "@/features/catalog/api";
@@ -12,6 +12,9 @@ import { QuoteHeaderForm } from "./QuoteHeaderForm";
 import { QuoteLinesTable } from "./QuoteLinesTable";
 import { QuoteTotalsCard } from "./QuoteTotalsCard";
 import { StatusBadge } from "./StatusBadge";
+import { useAuth } from "@/features/auth/useAuth";
+import { useState } from "react";
+import { SendQuoteDialog } from "./SendQuoteDialog";
 
 
 export function QuoteEditor({
@@ -28,7 +31,18 @@ export function QuoteEditor({
   const save = useSaveQuote();
   const remove = useDeleteQuote();
 
-   const pdf = useQuotePdf();
+  const pdf = useQuotePdf();
+
+  const { profile } = useAuth();
+  const pdfForSend = useQuotePdf();
+  const [send, setSend] = useState<{ url: string; key: number } | null>(null);
+  const client = clients.find((c) => c.id === editor.clientId) ?? null;
+
+  function handleSend() {
+    pdfForSend.mutate(quote.id, {
+      onSuccess: (url) => setSend((s) => ({ url, key: (s?.key ?? 0) + 1 })),
+    });
+  }
 
   function handlePdf() {
     // On ouvre l'onglet tout de suite (sinon le navigateur bloque la fenêtre ouverte après un appel réseau)
@@ -90,6 +104,17 @@ export function QuoteEditor({
             {pdf.isPending ? <Loader2 className="size-4 animate-spin" /> : <FileDown className="size-4" />}
             PDF
           </Button>
+
+           <Button
+            variant="outline"
+            onClick={handleSend}
+            disabled={pdfForSend.isPending || editor.dirty || editor.lines.length === 0}
+            title={editor.dirty ? "Enregistre d'abord le devis" : "Envoyer au client"}
+          >
+            {pdfForSend.isPending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+            Envoyer
+          </Button>
+
           <Button onClick={handleSave} disabled={save.isPending || editor.hasInvalid}>
             {save.isPending ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
             Enregistrer
@@ -111,6 +136,19 @@ export function QuoteEditor({
           )}
         </div>
       </div>
+      {send && (
+        <SendQuoteDialog
+          key={send.key}
+          open
+          onOpenChange={(open) => !open && setSend(null)}
+          quoteId={quote.id}
+          url={send.url}
+          client={client}
+          companyName={profile?.companyName ?? ""}
+          status={editor.status}
+          onSent={() => editor.syncStatus("sent")}
+        />
+      )}
     </div>
   );
 }

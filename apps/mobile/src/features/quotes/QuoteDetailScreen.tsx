@@ -1,18 +1,46 @@
-import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Linking, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { formatEuros, lineHtCents, TvaRateSchema } from "@devispro/shared";
+import { buildQuoteMessage, formatEuros, lineHtCents, quoteEmailSubject, TvaRateSchema } from "@devispro/shared";
 import { Button } from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { toMessage } from "@/lib/errors";
 import { colors, radius, spacing } from "@/theme";
-import { useQuote, useUpdateQuoteStatus } from "./hooks";
+import { useQuote, useQuotePdf, useUpdateQuoteStatus } from "./hooks";
 import { StatusSelector } from "./components/StatusSelector";
+import { useAuth } from "../auth/useAuth";
 
 export default function QuoteDetailScreen() {
   const { id = "" } = useLocalSearchParams<{ id: string }>();
   const { data: quote, isLoading, error, refetch } = useQuote(id);
   const updateStatus = useUpdateQuoteStatus(id);
+
+  const { profile } = useAuth();
+  const pdf = useQuotePdf();
+
+  function handleOpenPdf() {
+    pdf.mutate(id, {
+      onSuccess: (url) => void Linking.openURL(url),
+      onError: (err) => Alert.alert("PDF impossible", toMessage(err)),
+    });
+  }
+
+  function handleShare() {
+    pdf.mutate(id, {
+      onSuccess: async (url) => {
+        const companyName = profile?.companyName ?? "";
+        const result = await Share.share({
+          title: quoteEmailSubject(companyName),
+          message: buildQuoteMessage({ clientName: quote?.clients?.name, companyName, url }),
+        });
+        // Un brouillon partagé passe au statut « Envoyé »
+        if (result.action === Share.sharedAction && quote?.status === "draft") {
+          updateStatus.mutate("sent");
+        }
+      },
+      onError: (err) => Alert.alert("Envoi impossible", toMessage(err)),
+    });
+  }
 
   if (isLoading) return <ActivityIndicator style={{ marginTop: spacing(10) }} />;
   if (error || !quote) {
@@ -34,6 +62,19 @@ export default function QuoteDetailScreen() {
         {phone ? (
           <Button title={`📞 Appeler ${phone}`} variant="outline" onPress={() => Linking.openURL(`tel:${phone}`)} />
         ) : null}
+          <Button
+          title="📤 Envoyer au client"
+          variant="violet"
+          loading={pdf.isPending}
+          disabled={quote.quote_lines.length === 0}
+          onPress={handleShare}
+        />
+        <Button
+          title="📄 Voir le PDF"
+          variant="outline"
+          disabled={pdf.isPending || quote.quote_lines.length === 0}
+          onPress={handleOpenPdf}
+        />
       </View>
 
       {/* Statut */}

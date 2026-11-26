@@ -134,6 +134,12 @@ Chaque décision suit le même format : **contexte**, **choix**, **alternatives 
 - **Détail technique** : formatage manuel des montants, parce que `Intl` insère des espaces insécables absents de l'encodage des polices PDF standard (testé).
 - **Limite assumée** : mentions simplifiées pour la démo. Un vrai devis d'artisan exige aussi, selon le métier, l'assurance décennale, les conditions de paiement, etc.
 
+## 23. Envoi du devis par lien signé plutôt que par e-mail transactionnel
+
+- **Choix** : l'artisan envoie un lien signé (7 jours) vers le PDF, depuis sa propre messagerie (web : `mailto` ou copie ; mobile : partage natif WhatsApp, SMS, e-mail). Le message est construit par une fonction partagée et testée (`buildQuoteMessage`). Un brouillon envoyé passe au statut « Envoyé ».
+- **Alternatives écartées (pour l'instant)** : Resend ou un autre service transactionnel. Ils exigent un domaine vérifié, et le client répondrait à une adresse `noreply` au lieu de l'artisan.
+- **Évolution possible** : envoi via Resend avec suivi d'ouverture, une fois un domaine configuré.
+
 ---
 
 ## Incidents rencontrés et leçons

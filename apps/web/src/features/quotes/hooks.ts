@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { toMessage } from "@/lib/errors";
-import { createDraftQuote, deleteQuote, getQuote, listQuotes, saveQuote } from "./api";
+import { createDraftQuote, deleteQuote, getQuote, listQuotes, saveQuote, updateQuoteStatus } from "./api";
 import { generateQuoteDraft } from "./ai";
 import { generateQuotePdf } from "./pdf";
+import type { QuoteStatus } from "./status";
 
 export const quoteKeys = {
   all: ["quotes"] as const,
@@ -64,5 +65,14 @@ export function useQuotePdf() {
   return useMutation({
     mutationFn: (quoteId: string) => generateQuotePdf(quoteId),
     onError: (error) => toast.error("PDF impossible", { description: toMessage(error) }),
+  });
+}
+
+export function useUpdateQuoteStatus(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (status: QuoteStatus) => updateQuoteStatus(id, status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: quoteKeys.list() }),
+    onError: (error) => toast.error(toMessage(error)),
   });
 }

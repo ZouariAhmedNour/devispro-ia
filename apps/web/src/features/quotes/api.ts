@@ -70,3 +70,8 @@ export async function deleteQuote(id: string): Promise<void> {
   const { error } = await supabase.from("quotes").delete().eq("id", id);
   if (error) throw error;
 }
+
+export async function updateQuoteStatus(id: string, status: QuoteStatus): Promise<void> {
+  const { error } = await supabase.from("quotes").update({ status }).eq("id", id);
+  if (error) throw error;
+}
